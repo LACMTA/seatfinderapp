@@ -1,0 +1,163 @@
+#map{
+	position: absolute;
+    height: 400px;
+    left: 0; /*10%;*/
+    width:100%;/*500px;*/
+    top: 0;
+    bottom: 0;
+    border: black solid;
+}
+.bar{
+	width:700px;
+	height:395px;
+	
+}
+#results{
+	margin-top: 80px;
+}
+
+#match{
+	display: none;
+}
+#msg{
+	display: none;
+}
+#reset{
+  display: none;
+  color: red;
+}
+
+.header{
+	margin-bottom: 30px;
+	background: black;
+}
+.container-fluid {
+	background-color: black;
+}
+
+.custom-nav{
+	height: 80px;
+	background: black;
+}
+.link{
+  cursor: pointer
+}
+#start, #end, #radius{
+	color: red;
+}
+.modal-header, .modal-title{
+  background-color: black;
+  color: white;
+}
+
+#name, #phone, #metroid {
+  font-size: 10pt;
+  color:#337ab7;  
+}
+.form-control{
+  width : 75px
+}
+
+.objMarker{
+  background: url('../assets/starting_pin.png') no-repeat center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.endMarker{
+  background: url('../assets/destination_pin.png') no-repeat center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.custom-form{
+  padding-left: 0;
+  margin-left:20px;
+  margin-bottom: 50px;
+}
+
+.navbar-header{
+  height:100px;
+}
+
+.nav, .navbar-nav, .navbar-right, .custom-navbar-right{
+  margin-top: 30px;
+  
+}
+.nav, .navbar-nav, .navbar-right, .custom-navbar-right a{
+  color: white;
+  font-size: 12pt;
+}
+#myProgress {
+  text-align: center
+}
+#myBar {
+  width: 10%;
+  height: 30px;
+  background-color: #4CAF50;
+  text-align: center; /* To center it horizontally (if you want) */
+  line-height: 30px; /* To center it vertically */
+  color: white; 
+}
+
+@media only screen and (max-width:720px){
+  body{
+    width:700px;
+  }
+  .col-xs-12{
+    margin-bottom: 50px;
+    width: 80%
+  }
+  #map{
+    position: absolute;
+      height: 400px;
+      left: 2%; /*10%;*/
+      width:88%;/*500px;*/
+      top: 0;
+      bottom: 0;
+      border: black solid;
+  }
+ .nav, .navbar-nav, .navbar-right, .custom-navbar-right{
+    margin:-3.5px -31px;
+    padding-left: 43px;
+    background-color: black;
+  }
+
+  .nav, .navbar-nav, .navbar-right, .custom-navbar-right, a{
+    color:#337ab7;
+    font-size: 10pt;
+  }
+}
+@media only screen and (max-width:630px){
+  body{
+    width:700px;
+  }
+  .col-xs-12{
+    margin-bottom: 50px;
+    width: 58%
+  }
+  #map{
+    position: absolute;
+      height: 400px;
+      left: 2%; /*10%;*/
+      width:58%;/*500px;*/
+      top: 0;
+      bottom: 0;
+      border: black solid;
+  }
+  .nav, .navbar-nav, .navbar-right, .custom-navbar-right{
+    margin:-3.5px -31px;
+    padding-left: 43px;
+    background-color: black;
+    display:none;
+  }
+
+  .nav, .navbar-nav, .navbar-right, .custom-navbar-right a{
+    color:#337ab7;
+    font-size: 10pt;
+  }
+  
+}
