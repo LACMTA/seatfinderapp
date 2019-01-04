@@ -5,9 +5,9 @@ It will display the vanpool that departs from within 5, 10, 15, 20 mile radius s
 a starting zipcode and drops within 5 miles radius of destination zipcode
 *Noted that its only for one trip Home to Work place.
 */
-const apiKey = '' // google api key
-const mapboxpk = '' //mapbox key
-const sheetId = '' //google spread sheet ID
+const apiKey = config.API_KEY  // google api key
+const mapboxpk = config.MAPBOX_KEY 
+const sheetId = config.SHEET_ID  //google spread sheet ID
 const noticeText = 'Only the one-way trip <i>to</i> work is shown. Contact the vanpool for details about the trip home. '+ 
 				   'Pick-Up locations are the places that passengers <i>board</i> the vanpool on their way to work. Drop-Off Locations '+
 				   'are the places that passengers <i>exit</i> the vehicle on their way to begin their work day. Data updated Monthly'
