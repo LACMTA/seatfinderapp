@@ -10,7 +10,7 @@
 	<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
 	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
     <link href='css/style.css' rel='stylesheet' />
-    <script src='https://npmcdn.com/@turf/turf/turf.min.js'></script> 
+    <script src='https://npmcdn.com/@turf/turf/turf.min.js' async></script> 
 </head>
 
 <body>
@@ -105,15 +105,41 @@
 		  </div>
 		</div>
 	</div>
+	<script id="results-template" type="text/x-handlebars-template" async>
+	<tr>
+		<td>{{number}}</td>
+		<td><a class='link'
+					 data-toggle='modal'
+					 data-target='#info'
+					 data-info='{{inf}}'>{{id}}</a></td>
+		<td>{{pickup}}</td>
+		<td>{{pickup_time}}</td>
+		<td>{{dropoff}}</td>
+		<td>{{drop_time}}</td>
+		<td><a class='link'
+					data-toggle='modal'
+					data-target='#info'
+					data-info="{{inf}}">{{seats}}</a></td>
+		<td><a class="link mapit"
+					 href="#map" 
+					 data-target='#map'
+					 data-pick={{pickup_pt}}
+					 data-drop={{dropoff_pt}}
+					 data-start={{start_pt}}
+					 data-end={{end_pt}}>Map it</a></td>
+	</tr>
+	</script>
 <script
 	  src="https://code.jquery.com/jquery-3.2.1.min.js"
 	  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-	  crossorigin="anonymous">
+		crossorigin="anonymous">
 	</script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js'></script>
 	<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.11/lodash.min.js"></script>
-	<script src="js/main.js" crossorgin="anonymous"></script>
+	<script type="text/javascript" src="js/config.js" crossorgin="anonymous" async></script>
+	<script type="text/javascript" src="js/main.js" crossorgin="anonymous" async></script>
+	
 </body>
 </html>
