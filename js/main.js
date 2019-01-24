@@ -5,13 +5,13 @@ It will display the vanpool that departs from within 5, 10, 15, 20 mile radius s
 a starting zipcode and drops within 5 miles radius of destination zipcode
 *Noted that its only for one trip Home to Work place.
 */
-const apiKey = config.API_KEY  // google api key
-const mapboxpk = config.MAPBOX_KEY 
-const sheetId = config.SHEET_ID  //google spread sheet ID
-const noticeText = 'Only the one-way trip <i>to</i> work is shown. Contact the vanpool for details about the trip home. '+ 
+var API_KEY = config.API_KEY  // google api key
+var MAPBOXPK = config.MAPBOX_KEY 
+var SHEETID= config.SHEET_ID  //google spread sheet ID
+var NOTICE_TEXT = 'Only the one-way trip <i>to</i> work is shown. Contact the vanpool for details about the trip home. '+ 
 				   'Pick-Up locations are the places that passengers <i>board</i> the vanpool on their way to work. Drop-Off Locations '+
 				   'are the places that passengers <i>exit</i> the vehicle on their way to begin their work day. Data updated Monthly'
-const noVans = "Currently there are no matching vanpools. Try increasing your radius, call 213.922.7003 for assistance, "+
+var NO_VANS = "Currently there are no matching vanpools. Try increasing your radius, call 213.922.7003 for assistance, "+
 				"or <a href='http://www.metro.net/riding/vanpool/metro-vanpool-information-form/' target='_blank'>complete this short form</a> and we will contact you"
 var resultsTxt = 'Found %d trips | Click on Metro ID for contact information'
 var pickup = { //geojson for trips
@@ -31,7 +31,7 @@ var dest = {//getjson for end point
   "features": []
 }
 //init mapbox
-mapboxgl.accessToken = mapboxpk
+mapboxgl.accessToken = MAPBOXPK
 var map = new mapboxgl.Map({
 	container: 'map',
 	style: 'mapbox://styles/mapbox/streets-v9',
@@ -89,6 +89,7 @@ map.on('load', function(e) {
 								}
 							})
 						})
+						
 						var dest = turf.points(destPts)
 						var endPoints = turf.pointsWithinPolygon(dest, endPolygon) // find points within drop off polygon using the pick up polygon results.
 						// filtering the pts that are within both polygons.
@@ -103,12 +104,11 @@ map.on('load', function(e) {
 						return _.uniq(finalResults) // return a list with no duplicates
 					})
 					.then(results => {
-						var html = ''
 						$("#match").show();
 						$('#match tbody').empty();
 						if(results.length !== 0) {
 							$('#msg').empty().show().append(resultsTxt.replace('%d', results.length)).removeClass().addClass('alert alert-success')
-							$('#notice').empty().show().append(noticeText).addClass('alert alert-info')
+							$('#notice').empty().show().append(NOTICE_TEXT).addClass('alert alert-info')
 							var counter = 1;
 							var arr= []
 							results.forEach((item) =>{
@@ -143,7 +143,7 @@ map.on('load', function(e) {
 								arr.push(resultItemList);
 								counter++;
 							})
-							arr.forEach(function(a){
+							arr.forEach((a) =>{
 								$('#match tbody').append(a)
 							})
 							//Modal dialog with vanpool contact info
@@ -178,7 +178,7 @@ map.on('load', function(e) {
 							reset('start-loc','start-point', pointA)
 							reset('start-locB', 'start-pointB', pointB)	
 							$('#submit').button('reset')
-							$('#msg').empty().show().append(noVans).removeClass().addClass("alert alert-danger")
+							$('#msg').empty().show().append(NO_VANS).removeClass().addClass("alert alert-danger")
 						}
 					}).catch(error => {
 						reset('dest-point','dest-pt', dest)
@@ -203,31 +203,25 @@ map.on('load', function(e) {
 			}))
 		}
 	}) // end of submit
-  
 }) // end of map load
-
-
 //makes polygons to find intersection of locations within a radius
 function makePolygon(center, radius){
   var center = center;
   var radius = radius;
-  var options = {steps: 10, units: 'miles', properties: {foo: 'bar'}};
+  var options = {steps: 10, units: 'miles'};
   var circle = turf.circle(center, radius, options);
   return circle
 }
-
 //retrives general information about sheet
 function getSheetInfo(){
-  var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'?&key='+apiKey
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/'+SHEETID+'?&key='+API_KEY
   return axios.get(url)
 }
-
 //retrieves information from google sheet
 function getSheetData(title){
-  var link = 'https://sheets.googleapis.com/v4/spreadsheets/'+sheetId+'/values/'+title+'?&key='+apiKey
+  var link = 'https://sheets.googleapis.com/v4/spreadsheets/'+SHEETID+'/values/'+title+'?&key='+API_KEY
   return axios.get(link)
 }
-
 //draw results to map 
 function mapIt(map, origin, destination, pickup, drop){
 	$('#map').scroll()
@@ -240,13 +234,11 @@ function mapIt(map, origin, destination, pickup, drop){
 	reset('dest-point','dest-pt', drop)
 	drawDest(map, 'dest-pt')
 }
-
 //reset map layers and source
 function reset(id, source, data){
 	removeLayer(id,source)
 	removeSource(source, data)
 }
-
 //resets DOM
 function resetDom(){
 	$('#msg').empty().hide()
@@ -256,15 +248,10 @@ function resetDom(){
 	$('#reset').show()
 	$('#match').hide()
 }
-
 //checks how many seats are open
 function seatChecked(current, capacity){
 	var num = current-capacity
-	if(num<=0){
-		return 'Call'
-	} else{
-		return num
-	}
+	return num <= 0 ? 'Call' : num
 }
 //removes secs from pickup and drop off tiems
 function removeSecs(time){
@@ -278,10 +265,10 @@ function removeSecs(time){
 function validation (origin, destination, radius){
 	var regexTest = RegExp('^[0-9]*$')
 	if(origin == "" && destination == ""){
-  	$('#start').text('Please enter a origin zipcode').show().fadeOut(2000);
-    $('#end').text('Please enter a destination zipcode').show().fadeOut(2000);
-    $('#submit').button('reset')
-  	return false
+		$('#start').text('Please enter a origin zipcode').show().fadeOut(2000);
+		$('#end').text('Please enter a destination zipcode').show().fadeOut(2000);
+		$('#submit').button('reset')
+		return false
 	} else if (destination == "") {
 		$('#end').text('Please enter a destination zipcode').show().fadeOut(2000);
 		$('#submit').button('reset')
@@ -322,7 +309,6 @@ function removeSource(id, dat){
 		map.getSource(id).setData(dat);
 	}
 }
-
 //clean ups map layer
 function removeLayer(id, source){
 	if(map.getLayer(id) !== undefined){
@@ -367,7 +353,6 @@ function drawDest(map, source){
 		}
 	});
 }
-
 //draws home, origin or pick up marker 
 function drawStartPoint(map,data){
 	var obj = (document.getElementsByClassName('objMarker'))
@@ -388,7 +373,6 @@ function drawStartPoint(map,data){
 		marker.addTo(map)
 	}
 }
-
 //draw drop off marker
 function drawEndPoint(map,data){
 	var obj = (document.getElementsByClassName('endMarker'))
@@ -409,7 +393,6 @@ function drawEndPoint(map,data){
 		marker.addTo(map)
 	}
 }
-
 /*
 	Finds the center of the zipcode in latitude and longitude
 	using mapbox geocode service
@@ -417,10 +400,9 @@ function drawEndPoint(map,data){
 	return a promise with the geocode information
 */
 function latLong(num){
-	var url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + num + ".json?access_token=" + mapboxpk +"&country=us&limit=2"
+	var url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + num + ".json?access_token=" + MAPBOXPK +"&country=us&limit=2"
 	return axios.get(url)
 }
-
 /*
 Validates if Zipcode entered belongs only to california
 @param zipcode value
