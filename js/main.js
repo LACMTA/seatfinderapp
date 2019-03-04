@@ -5,13 +5,13 @@ It will display the vanpool that departs from within 5, 10, 15, 20 mile radius s
 a starting zipcode and drops within 5 miles radius of destination zipcode
 *Noted that its only for one trip Home to Work place.
 */
-var API_KEY = config.API_KEY  // google api key
-var MAPBOXPK = config.MAPBOX_KEY 
-var SHEETID= config.SHEET_ID  //google spread sheet ID
-var NOTICE_TEXT = 'Only the one-way trip <i>to</i> work is shown. Contact the vanpool for details about the trip home. '+ 
+const API_KEY = config.API_KEY  // google api key
+const MAPBOXPK = config.MAPBOX_KEY 
+const SHEETID= config.SHEET_ID  //google spread sheet ID
+const NOTICE_TEXT = 'Only the one-way trip <i>to</i> work is shown. Contact the vanpool for details about the trip home. '+ 
 				   'Pick-Up locations are the places that passengers <i>board</i> the vanpool on their way to work. Drop-Off Locations '+
 				   'are the places that passengers <i>exit</i> the vehicle on their way to begin their work day. Data updated Monthly'
-var NO_VANS = "Currently there are no matching vanpools. Try increasing your radius, call 213.922.7003 for assistance, "+
+const NO_VANS = "Currently there are no matching vanpools. Try increasing your radius, call 213.922.7003 for assistance, "+
 				"or <a href='http://www.metro.net/riding/vanpool/metro-vanpool-information-form/' target='_blank'>complete this short form</a> and we will contact you"
 var resultsTxt = 'Found %d trips | Click on Metro ID for contact information'
 var pickup = { //geojson for trips
@@ -66,42 +66,13 @@ map.on('load', function(e) {
 				var endB = endCoord.data.features[0]
 				if(validateZipcode(startA) && validateZipcode(endB)){
 					var sheetData = getSheetData(sheetInfo.data.sheets[0].properties.title); //vanpool data from google sheets
-					var startPolygon = makePolygon(startA.center, radius.val()) // home or pick up polygon
-					var endPolygon = makePolygon(endB.center, 5) // destination polygon notice radius of 5 miles since we want drop offs located withing 5 miles radius
 					sheetData.then(response => {
 						var rows = response.data.values.slice(1,response.data.values.length)
-						var points = [];
-						var partialResults = []
-						var finalResults = []
-						var destPts = []
-						// adding all the pts from google sheet
-						rows.forEach(row =>{
-							points.push([row[9],row[8]])
-						})
-						var originPts = turf.points(points) // convert to Geojson
-						var resultPts = turf.pointsWithinPolygon(originPts, startPolygon) // find points within pickup polygon
-						// using the pts within the pickup polygon find the destination coords	
-						rows.forEach(row => {
-							resultPts.features.forEach(rpts =>{
-								if(row[9]===turf.getCoord(rpts)[0] && row[8]===turf.getCoord(rpts)[1]) {
-									destPts.push([row[11],row[10]])
-									partialResults.push(row)
-								}
-							})
-						})
-						
-						var dest = turf.points(destPts)
-						var endPoints = turf.pointsWithinPolygon(dest, endPolygon) // find points within drop off polygon using the pick up polygon results.
-						// filtering the pts that are within both polygons.
-						partialResults.forEach(row => {
-							endPoints.features.forEach(endp => {
-								if(row[11]===turf.getCoord(endp)[0] && row[10]===turf.getCoord(endp)[1]) {
-									finalResults.push(row)
-								}
-							})
-						})
+						return filterItems(rows, radius, startA, 'pick')
+					})
+					.then(results=>{
 						$btn.button('reset')
-						return _.uniq(finalResults) // return a list with no duplicates
+						return filterItems(results, radius, endB, 'drop')
 					})
 					.then(results => {
 						$("#match").show();
@@ -204,11 +175,30 @@ map.on('load', function(e) {
 		}
 	}) // end of submit
 }) // end of map load
+
+//filter items that are matching the radius selected by user
+function filterItems(items, radius, pointFromTo, pickordrop) {
+	return items.filter(item => {
+		var pointA = ''
+		var pointB = ''
+		if(pickordrop === 'pick') {
+			pointA = turf.point([item[9],item[8]])
+			pointB = turf.point(pointFromTo.center)
+		} else {
+			pointA = turf.point([item[11],item[10]])
+			pointB = turf.point(pointFromTo.center)
+		}
+		let distance = turf.distance(pointA, pointB, {units: 'miles'})
+		if(distance <= radius.val()) {
+			return items
+		}
+	})
+}
 //makes polygons to find intersection of locations within a radius
 function makePolygon(center, radius){
   var center = center;
   var radius = radius;
-  var options = {steps: 10, units: 'miles'};
+  var options = {steps: 15, units: 'miles'};
   var circle = turf.circle(center, radius, options);
   return circle
 }
@@ -250,8 +240,8 @@ function resetDom(){
 }
 //checks how many seats are open
 function seatChecked(current, capacity){
-	var num = current-capacity
-	return num <= 0 ? 'Call' : num
+	var numOfSeats = current - capacity
+	return numOfSeats <= 0 ? 'Call' : numOfSeats
 }
 //removes secs from pickup and drop off tiems
 function removeSecs(time){
@@ -378,7 +368,7 @@ function drawEndPoint(map,data){
 	var obj = (document.getElementsByClassName('endMarker'))
 	var marker = ''
 	var el =''
-	if(obj.length==0){
+	if(obj.length == 0){
 		el = document.createElement('div')
 		el.className='endMarker'
 		marker = new mapboxgl.Marker(el)
@@ -400,7 +390,7 @@ function drawEndPoint(map,data){
 	return a promise with the geocode information
 */
 function latLong(num){
-	var url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + num + ".json?access_token=" + MAPBOXPK +"&country=us&limit=2"
+	var url = "https://api.mapbox.com/geocoding/v5/mapbox.places/" + num + ".json?access_token=" + MAPBOXPK + "&types=postcode&country=us" //"&country=us&limit=2&types=postcode"
 	return axios.get(url)
 }
 /*
